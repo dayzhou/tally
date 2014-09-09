@@ -2,7 +2,7 @@
 
 - - -
 
-Tally is _**web-based**_ program for recording everyday incomes and expenses.
+Tally is a _**web-based**_ program for recording everyday incomes and expenses. The underlying web engine is [_Bottle_](http://bottlepy.org) which is a _Python_ web framework.
 
 - - -
 
@@ -14,4 +14,4 @@ Tally is _**web-based**_ program for recording everyday incomes and expenses.
 
 ### License
 
-Code is available according to the MIT License (see LICENSE).
+The code is available according to the MIT License (see LICENSE).

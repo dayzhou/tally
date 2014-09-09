@@ -28,18 +28,20 @@
     <p>&nbsp;<font color=red>Table</font></p>
     <form method=post action="insert">
         <table cellspacing=5 style="margin-top:10px; margin-bottom: 10px; border: 0px solid #3399FF;">
-    % for i in range( 4 ) :
+    % for i in range( num_of_rows ) :
         <tr>
             <td>商品</td>
-            <td><input type=text name=ware{{i}} size=30 value=''></td>
+            <td><input type=text name=ware{{i}} size=25 value=''></td>
             <td> &nbsp; 费用</td>
             <td><select name=currency{{i}}>
-                <option selected>CNY&#165;
-                <option >&pound;
-                <option >U.S.$
+        % for currency in currencies :
+                <option {{currency.is_selected}}>{{!currency.html}}
+        % end
                 </select>
             </td>
-            <td><input type=text name=cost{{i}} size=15 value=''> &nbsp;
+            <td><input type=text name=cost{{i}} size=10 value=''></td>
+            <td> &nbsp; 备注</td>
+            <td><input type=text name=remark{{i}} size=30 value=''> &nbsp;
                 <font color=red>msg</font>
             </td>
         </tr>

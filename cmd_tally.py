@@ -9,12 +9,16 @@ import sqlite3
 ########################################## Create Tables
 
 def create_default_values_table( cur ) :
+    KeysValues = (
+        ('currency', '1'),
+        ('rows_in_one_insertion', '4'),
+    )
     cur.execute( 'DROP TABLE IF EXISTS default_values' )
     cur.execute( 'CREATE TABLE default_values( \
         key TEXT UNIQUE, \
         value TEXT )' \
     )
-    cur.execute( "INSERT INTO default_values VALUES('currency','1')" )
+    cur.executemany( "INSERT INTO default_values VALUES(?,?)", KeysValues )
 
 
 def create_tally_table( cur ) :
@@ -95,6 +99,21 @@ def insert_into_tally_table( cur, ware, cost, currency, remark='', date='' ) :
 
 ##########################################
 
+def get_from_default_values_table( cur, key ) :
+    cur.execute( 'SELECT value FROM default_values WHERE key=?', (key,) )
+    value = cur.fetchone()
+    if value :
+        return value[0]
+    else :
+        return None
+
+
+def get_from_currencies_table( cur, *what ) :
+    cur.execute( 'SELECT %s FROM currencies' % ','.join( what ) )
+    return cur.fetchall()
+
+##########################################
+
 class _TallyCmd ( cmd.Cmd ) :
     """Command line tools"""
 
@@ -104,15 +123,30 @@ class _TallyCmd ( cmd.Cmd ) :
         self.cursor = cursor
 
     def do_CreateTable( self, args ) :
+        """Create some specific table you want.
+        CreateTable currencies
+            create "currencies" table
+        CreateTable tally
+            create "tally" table
+        CreateTable default_values
+            create "default_values" table
+        CreateTable all
+            create all above 3 tables
+        """
         if args == 'currencies' :
             create_currencies_table( self.cursor )
-            print( 'Table "currencies" created' )
+            print( 'Table "currencies" is created.' )
         elif args == 'tally' :
             create_tally_table( self.cursor )
-            print( 'Table "tally" created' )
+            print( 'Table "tally" is created.' )
         elif args == 'default_values' :
             create_default_values_table( self.cursor )
-            print( 'Table "default_values" created' )
+            print( 'Table "default_values" is created.' )
+        elif args == 'all' :
+            create_currencies_table( self.cursor )
+            create_tally_table( self.cursor )
+            create_default_values_table( self.cursor )
+            print( 'All 3 tables "default_values", "tally" and "currencies" are created.' )
 
     def do_prompt( self, args ) :
         """ Change interactive prompt :
