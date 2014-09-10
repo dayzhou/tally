@@ -26,7 +26,7 @@
     <div style="border-bottom: 1px solid #3399FF; width: 300px;"></div>
     
     <p>&nbsp;<font color=red>Table</font></p>
-    <form method=post action="insert">
+    <form method=post action="/record">
         <table cellspacing=5 style="margin-top:10px; margin-bottom: 10px; border: 0px solid #3399FF;">
     % for i in range( num_of_rows ) :
         <tr>
@@ -34,8 +34,8 @@
             <td><input type=text name=ware{{i}} size=25 value=''></td>
             <td> &nbsp; 费用</td>
             <td><select name=currency{{i}}>
-        % for currency in currencies :
-                <option {{currency.is_selected}}>{{!currency.html}}
+        % for c in AllCurrencies :
+                <option value={{c.curid}} {{'selected' if c.curid==currency else ''}}>{{!c.html}}
         % end
                 </select>
             </td>
@@ -55,18 +55,19 @@
 
 % if operation == 'VIEW' :
     <div class="right_box">
-    <form method=post action="select">
+    <form method=post action="/view">
         <table style="margin-top:10px; margin-bottom: 10px; border: 0px solid #3399FF;">
         <tr>
         <td width=100>选择年月</td>
         <td width=200><select name=year>
-            <option selected>2014
-            <option>2013
+        % for y in AllYears :
+            <option {{'selected' if y==year else ''}}>{{y}}
+        % end
             </select>
             <select name=month>
-            <option selected>09/Sept.
-            <option>08/Oct.
-            <option>07/Jul.
+        % for m in [ '%02d' % mo for mo in range(1,13) ] :
+            <option {{'selected' if m==month else ''}}>{{m}}
+        % end
             </select>
         </td>
         <td><input class="LoginButton" type=submit value=查询>
@@ -79,19 +80,27 @@
     <table class="table_border" style="margin-top:20px;">
         <tr align=center>
             <td width=100>日期</td>
-            <td width=50>ID</td>
-            <td width=180>商品</td>
-            <td width=100>花费</td>
-            <td width=160>备忘</td>
+            <td width=200>商品</td>
+            <td width=120>花费</td>
+            <td width=200>备忘</td>
         </tr>
-<!--        $for pub in arg[0] : -->
+        % for row in TallyRows :
             <tr align=center>
-            <td width=100>2014-09-07</td>
-            <td width=50>1</td>
-            <td width=180>a pile of shit</td>
-            <td width=100>U.S.$1000</td>
-            <td width=160></td>
+            <td width=100>{{row.date}}</td>
+            <td width=200>{{row.ware}}</td>
+            <td width=120>{{!row.cost}}</td>
+            <td width=200>{{row.remark}}</td>
             </tr>
+        % end
+        <tr><td colspan=4></td></tr>
+        % for row in TotalTallyRows :
+            <tr align=center>
+            <td width=100><font color=green>Total</font></td>
+            <td width=200>-</td>
+            <td width=120><font color=green>{{!row.cost}}</font></td>
+            <td width=200>-</td>
+            </tr>
+        % end
     </table>
     </div>
 % end
