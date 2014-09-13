@@ -11,8 +11,8 @@ License: MIT
 
 import sys
 import os
-#import sqlite3
-from datetime import datetime
+import re
+import datetime as dt
 import bottle as bot
 from db_manager import *
 
@@ -59,19 +59,55 @@ class CTotalTally :
 
 
 class CInputRow :
-    """Input row class, contains 5 fields:
+    """Input row class, contains 6 fields:
         "date"     : date on which money are spent
         "ware"     : the ware the money is spent for
         "currency" : currency (money)
         "cost"     : money the ware costs
         "remark"   : notes for memo
+        "msg"      : message for invalid input
     """
-    def __init__( self, date='', ware='', currency=1, cost=0, remark='' ) :
-        self.date = date
+    def __init__( self, date='', ware='', currency=1, cost='', remark='' ) :
+        today = dt.date.today()
+        self.date = date or '%d-%02d-%02d' % (today.year,today.month,today.day)
         self.ware = ware
         self.currency = currency
         self.cost = cost
         self.remark = remark
+        self.msg = {'date':'', 'ware':'', 'cost':'', 'remark':''}
+    
+    def check_and_format( self ) :
+        evalidate = True
+        
+        try :
+            ymd = [ int(x) for x in self.date.split('-') ]
+            if dt.date( *ymd ) > dt.date.today() :
+                self.msg['date'] = u'不能填写未来的日期'
+                evalidate = False
+            else :
+                self.date = str( dt.date( *ymd ) )
+        except ValueError :
+            self.msg['date'] = u'错误的日期格式'
+            evalidate = False
+        
+        if not self.ware :
+            self.msg['ware'] = u'必须填写商品名称'
+            evalidate = False
+        elif len( self.ware ) > 30 :
+            self.msg['ware'] = u'商品名称不应超过30字符'
+            evalidate = False
+        
+        try :
+            self.cost = float( self.cost )
+        except :
+            self.msg['cost'] = u'金额必须是一个数'
+            evalidate = False
+        
+        if len( self.remark ) > 50 :
+            self.msg['remark'] = u'备忘内容不应超过50字符'
+            evalidate = False
+        
+        return evalidate
 
 
 def get_default_number_of_rows_in_1_insertion() :
@@ -104,7 +140,7 @@ def get_total_tally_list( date ) :
 
 def get_all_years() :
     MinYear = cursor.get_minimal_year()
-    CurYear = datetime.now().year
+    CurYear = dt.date.today().year
     if MinYear :
         return [ str(y) for y in range( MinYear, CurYear+1 ) ]
     else :
@@ -114,11 +150,13 @@ def get_all_years() :
 @bot.route( '/' )
 @bot.route( '/record' )
 def record() :
+    InputRows = get_default_number_of_rows_in_1_insertion() * \
+        [ CInputRow( currency=get_default_currency() ) ]
+    
     return bot.template( 'tally',
         operation = 'RECORD',
-        num_of_rows = get_default_number_of_rows_in_1_insertion(),
-        currency = get_default_currency(),
         AllCurrencies = get_currencies_list(),
+        InputRows = InputRows,
     )
 
 
@@ -126,23 +164,36 @@ def record() :
 def post_record() :
     InputRows = [
         CInputRow(
+            date = '-'.join(
+                [ bot.request.forms.get( '%s%d' % (x,i) )
+                    for x in ('year','month','day') ]
+            ),
             ware = bot.request.forms.get( 'ware%d' % i ),
-            currency = bot.request.forms.get( 'currency%d' % i ),
+            currency = int( bot.request.forms.get( 'currency%d' % i ) ),
             cost = bot.request.forms.get( 'cost%d' % i ),
-            remark = bot.request.forms.get( 'remark%d' % i )
-        ) for i in range( get_default_number_of_rows_in_1_insertion() )
+            remark = bot.request.forms.get( 'remark%d' % i ),
+        )
+        for i in range( get_default_number_of_rows_in_1_insertion() )
     ]
-    for row in InputRows :
-        cursor.insert_into_tally_table( row=row )
-    bot.redirect( '/view' )
+    
+    if False in [ row.check_and_format() for row in InputRows ] :
+        return bot.template( 'tally',
+            operation = 'RECORD',
+            AllCurrencies = get_currencies_list(),
+            InputRows = InputRows,
+        )
+    else :
+        for row in InputRows :
+            cursor.insert_into_tally_table( row=row )
+        bot.redirect( '/view' )
 
 
 @bot.route( '/view' )
 @bot.route( '/view/<date:re:20[0-9][0-9]-(0[1-9]|1[0-2])>' )
 def view( date=None ) :
     if not date :
-        now = datetime.now()
-        date = '%d-%02d' % ( now.year, now.month )
+        today = dt.date.today()
+        date = '%d-%02d' % ( today.year, today.month )
 
     return bot.template( 'tally',
         operation = 'VIEW',

@@ -25,24 +25,43 @@
     <p>在下面写上你的花销吧</p>
     <div style="border-bottom: 1px solid #3399FF; width: 300px;"></div>
     
-    <p>&nbsp;<font color=red>Table</font></p>
     <form method=post action="/record">
         <table cellspacing=5 style="margin-top:10px; margin-bottom: 10px; border: 0px solid #3399FF;">
-    % for i in range( num_of_rows ) :
+    % for i,row in enumerate( InputRows ) :
+        <tr>
+            <td></td>
+            <td><font color=red>{{row.msg['ware']}}</font></td>
+            
+            <td></td>
+            <td><font color=red>{{row.msg['cost']}}</font></td>
+            
+            <td></td>
+            <td><font color=red>{{row.msg['remark']}}</font></td>
+            
+            <td></td>
+            <td><font color=red>{{row.msg['date']}}</font></td>
+        </tr>
         <tr>
             <td>商品</td>
-            <td><input type=text name=ware{{i}} size=25 value=''></td>
-            <td> &nbsp; 费用</td>
+            <td><input type=text name=ware{{i}} size=25 value='{{row.ware}}'></td>
+            
+            <td> &nbsp; 金额</td>
             <td><select name=currency{{i}}>
         % for c in AllCurrencies :
-                <option value={{c.curid}} {{'selected' if c.curid==currency else ''}}>{{!c.html}}
+                <option value={{c.curid}} {{'selected' if c.curid==row.currency else ''}}>{{!c.html}}
         % end
                 </select>
+                <input type=text name=cost{{i}} size=10 value='{{row.cost}}'>
             </td>
-            <td><input type=text name=cost{{i}} size=10 value=''></td>
+            
             <td> &nbsp; 备注</td>
-            <td><input type=text name=remark{{i}} size=30 value=''> &nbsp;
-                <font color=red>msg</font>
+            <td><input type=text name=remark{{i}} size=30 value='{{row.remark}}'></td>
+            
+        % year, month, day = row.date.split('-')
+            <td> &nbsp; 日期</td>
+            <td><input type=text name=year{{i}} size=4 value='{{year}}'> -
+                <input type=text name=month{{i}} size=2 value='{{month}}'> -
+                <input type=text name=day{{i}} size=2 value='{{day}}'>
             </td>
         </tr>
     % end
@@ -81,7 +100,7 @@
         <tr align=center>
             <td width=100>日期</td>
             <td width=200>商品</td>
-            <td width=120>花费</td>
+            <td width=120>金额</td>
             <td width=200>备忘</td>
         </tr>
         % for row in TallyRows :

@@ -78,7 +78,7 @@ class TallyCursor( sqlite3.Cursor ) :
             cost = row.cost
             remark = row.remark
         
-        if row.date :
+        if date :
             self.execute( 'INSERT INTO tally(date,ware,currency,cost,remark) \
                 VALUES(?,?,?,?,?)', (date,ware,currency,cost,remark) \
             )
