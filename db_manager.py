@@ -121,6 +121,9 @@ class TallyCursor( sqlite3.Cursor ) :
             return int( date[:4] )
         else :
             return None
+    
+    def update_default_values_table( self, key, value ) :
+        self.execute( 'UPDATE default_values SET value=? WHERE key=?', (value,key) )
 
 
 def get_tally_connection() :

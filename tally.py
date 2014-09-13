@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding=utf-8
 r"""
+This is an online running tally application.
 
 Author : Da Zhou
 Email  : day.zhou.free@gmail.com
@@ -17,7 +18,7 @@ import bottle as bot
 from db_manager import *
 
 # =============================================
-__version__ = '0.0'
+__version__ = '0.1'
 __license__ = 'MIT'
 
 # =============================================
@@ -75,10 +76,29 @@ class CInputRow :
         self.cost = cost
         self.remark = remark
         self.msg = {'date':'', 'ware':'', 'cost':'', 'remark':''}
+        self.is_empty = False
     
     def check_and_format( self ) :
+        if not self.ware :
+            self.is_empty = True
+            return True
+
         evalidate = True
         
+        if len( self.ware ) > 30 :
+            self.msg['ware'] = u'商品名称不应超过30字符'
+            evalidate = False
+
+        if len( self.remark ) > 50 :
+            self.msg['remark'] = u'备忘内容不应超过50字符'
+            evalidate = False
+        
+        try :
+            self.cost = float( self.cost )
+        except ValueError :
+            self.msg['cost'] = u'金额必须是一个数'
+            evalidate = False
+
         try :
             ymd = [ int(x) for x in self.date.split('-') ]
             if dt.date( *ymd ) > dt.date.today() :
@@ -88,23 +108,6 @@ class CInputRow :
                 self.date = str( dt.date( *ymd ) )
         except ValueError :
             self.msg['date'] = u'错误的日期格式'
-            evalidate = False
-        
-        if not self.ware :
-            self.msg['ware'] = u'必须填写商品名称'
-            evalidate = False
-        elif len( self.ware ) > 30 :
-            self.msg['ware'] = u'商品名称不应超过30字符'
-            evalidate = False
-        
-        try :
-            self.cost = float( self.cost )
-        except :
-            self.msg['cost'] = u'金额必须是一个数'
-            evalidate = False
-        
-        if len( self.remark ) > 50 :
-            self.msg['remark'] = u'备忘内容不应超过50字符'
             evalidate = False
         
         return evalidate
@@ -183,7 +186,7 @@ def post_record() :
             InputRows = InputRows,
         )
     else :
-        for row in InputRows :
+        for row in [ x for x in InputRows if not x.is_empty ] :
             cursor.insert_into_tally_table( row=row )
         bot.redirect( '/view' )
 
@@ -210,6 +213,31 @@ def post_view() :
     year = bot.request.forms.get( 'year' )
     month = bot.request.forms.get( 'month' )
     bot.redirect( '/view/%s-%s' % (year,month) )
+
+
+@bot.route( '/settings' )
+def settings() :
+    return bot.template( 'tally',
+        operation = 'SETTINGS',
+        AllCurrencies = get_currencies_list(),
+        currency = get_default_currency(),
+        num_of_rows = get_default_number_of_rows_in_1_insertion(),
+    )
+
+
+@bot.post( '/settings/default_currrency' )
+def post_settings() :
+    pass
+
+@bot.post( '/settings/num_of_rows' )
+def post_settings() :
+    number = bot.request.forms.get( 'num_of_rows' )
+    cursor.update_default_values_table( 'rows_in_1_insertion', str(number) )
+    bot.redirect( '/record' )
+
+@bot.post( '/settings/add_currrency' )
+def post_settings() :
+    pass
 
 # =============================================
 if __name__ == '__main__' :

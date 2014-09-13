@@ -15,6 +15,7 @@
     <div class="left_box">
         <p><a href="/record">记账啦</a></p>
         <p><a href="/view">查水表</a></p>
+        <p><a href="/settings">设置</a></p>
     </div>
 </div>
 
@@ -22,7 +23,7 @@
 
 % if operation == 'RECORD' :
     <div class="right_box">
-    <p>在下面写上你的花销吧</p>
+    <p>收入或支出</p>
     <div style="border-bottom: 1px solid #3399FF; width: 300px;"></div>
     
     <form method=post action="/record">
@@ -47,9 +48,9 @@
             
             <td> &nbsp; 金额</td>
             <td><select name=currency{{i}}>
-        % for c in AllCurrencies :
+            % for c in AllCurrencies :
                 <option value={{c.curid}} {{'selected' if c.curid==row.currency else ''}}>{{!c.html}}
-        % end
+            % end
                 </select>
                 <input type=text name=cost{{i}} size=10 value='{{row.cost}}'>
             </td>
@@ -66,7 +67,7 @@
         </tr>
     % end
         </table>
-        <input class="LoginButton" type=submit value=提交>
+        <input class="LoginButton" type=submit value='提交'>
     </form>
     </div>
 % end
@@ -77,19 +78,19 @@
     <form method=post action="/view">
         <table style="margin-top:10px; margin-bottom: 10px; border: 0px solid #3399FF;">
         <tr>
-        <td width=100>选择年月</td>
-        <td width=200><select name=year>
-        % for y in AllYears :
-            <option {{'selected' if y==year else ''}}>{{y}}
-        % end
-            </select>
-            <select name=month>
-        % for m in [ '%02d' % mo for mo in range(1,13) ] :
-            <option {{'selected' if m==month else ''}}>{{m}}
-        % end
-            </select>
-        </td>
-        <td><input class="LoginButton" type=submit value=查询>
+            <td width=100>选择年月</td>
+            <td width=200><select name=year>
+            % for y in AllYears :
+                <option {{'selected' if y==year else ''}}>{{y}}
+            % end
+                </select>
+                <select name=month>
+            % for m in [ '%02d' % mo for mo in range(1,13) ] :
+                <option {{'selected' if m==month else ''}}>{{m}}
+            % end
+                </select>
+            </td>
+            <td><input class="LoginButton" type=submit value='查询'></td>
         </tr>
         </table>
     </form>
@@ -103,14 +104,14 @@
             <td width=120>金额</td>
             <td width=200>备忘</td>
         </tr>
-        % for row in TallyRows :
-            <tr align=center>
+    % for row in TallyRows :
+        <tr align=center>
             <td width=100>{{row.date}}</td>
             <td width=200>{{row.ware}}</td>
             <td width=120>{{!row.cost}}</td>
             <td width=200>{{row.remark}}</td>
-            </tr>
-        % end
+        </tr>
+    % end
         <tr><td colspan=4></td></tr>
         % for row in TotalTallyRows :
             <tr align=center>
@@ -121,6 +122,52 @@
             </tr>
         % end
     </table>
+    </div>
+% end
+
+
+% if operation == 'SETTINGS' :
+    <div class="right_box">
+    <p>修改默认货币</p>
+    <form method=post action="/settings/default_currency">
+        <table style="margin-top:10px; margin-bottom: 10px; border: 0px solid #3399FF;">
+        <tr>
+            <td width=100><select name=currency>
+            % for c in AllCurrencies :
+                <option value={{c.curid}} {{'selected' if c.curid==currency else ''}}>{{!c.html}}
+            % end
+                </select>
+            </td>
+            <td width=50></td>
+            <td><input class="LoginButton" type=submit value='确定'></td>
+        </tr>
+        </table>
+    </form>
+    
+    <div style="border-bottom: 1px solid #3399FF; width: 300px;"></div>
+    
+    <p>修改默认每次输入的记录数</p>
+    <form method=post action="/settings/num_of_rows">
+        <table style="margin-top:10px; margin-bottom: 10px; border: 0px solid #3399FF;">
+        <tr>
+            <td width=100><select name=num_of_rows>
+            % for i in range( 1, 11 ) :
+                <option {{'selected' if i==num_of_rows else ''}}>{{i}}
+            % end
+                </select>
+            </td>
+            <td width=50></td>
+            <td><input class="LoginButton" type=submit value='确定'></td>
+        </tr>
+        </table>
+    </form>
+    
+    <div style="border-bottom: 1px solid #3399FF; width: 300px;"></div>
+    
+    <p>添加新货币</p>
+    <form method=post action="/settings/add_currency">
+        
+    </form>
     </div>
 % end
 

@@ -35,7 +35,7 @@ Tally is a _**web-based**_ program for recording everyday incomes and expenses. 
     * That also means it needs to import classes and functions from _"db_manager.py"_
 
 * _db_manager.py_
-    * A **command line tool** for manipulating the database _"tally.db"
+    * A **command line tool** for manipulating the database _"tally.db"_
     * Also as a library imported by _"tally.py"_
     * Hack it yourself
 
