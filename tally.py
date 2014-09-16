@@ -48,7 +48,7 @@ class CTally :
     def __init__( self, tt ) :
         self.date = tt[0]
         self.ware = tt[1]
-        self.cost = '%s %d' % ( tt[2], tt[3] )
+        self.cost = '%s %g' % ( tt[2], tt[3] )
         self.remark = tt[4]
 
 
@@ -56,7 +56,7 @@ class CTotalTally :
     """Total tally class, contains only 1 fields : "cost"
     """
     def __init__( self, ttt ) :
-        self.cost = '%s %d' % ( ttt[0], ttt[1] )
+        self.cost = '%s %g' % ( ttt[0], ttt[1] )
 
 
 class CInputRow :
@@ -132,13 +132,24 @@ def get_currencies_list() :
         cursor.get_from_currencies_table( 'curid', 'html' ) ]
 
 
-def get_tally_list( date ) :
-    return [ CTally(row) for row in cursor.get_from_tally_table(date) ]
+def get_monthly_tally_list( date ) :
+    return [ CTally(row) for row in \
+        cursor.get_monthly_data_from_tally_table(date) ]
 
 
-def get_total_tally_list( date ) :
+def get_monthly_income_tally_list( date ) :
     return [ CTotalTally(row) for row in \
-        cursor.group_get_from_tally_table(date) ]
+        cursor.get_monthly_income_from_tally_table(date) ]
+
+
+def get_monthly_expenses_tally_list( date ) :
+    return [ CTotalTally(row) for row in \
+        cursor.get_monthly_expenses_from_tally_table(date) ]
+
+
+def get_monthly_balance_tally_list( date ) :
+    return [ CTotalTally(row) for row in \
+        cursor.get_monthly_balance_from_tally_table(date) ]
 
 
 def get_all_years() :
@@ -203,8 +214,10 @@ def view( date=None ) :
         year = date[:4],
         month = date[-2:],
         AllYears = get_all_years(),
-        TallyRows = get_tally_list( date ),
-        TotalTallyRows = get_total_tally_list( date ),
+        TallyRows = get_monthly_tally_list( date ),
+        IncomeRows = get_monthly_income_tally_list( date ),
+        ExpensesRows = get_monthly_expenses_tally_list( date ),
+        BalanceRows = get_monthly_balance_tally_list( date ),
     )
 
 
@@ -225,9 +238,11 @@ def settings() :
     )
 
 
-@bot.post( '/settings/default_currrency' )
+@bot.post( '/settings/default_currency' )
 def post_settings() :
-    pass
+    number = bot.request.forms.get( 'currency' )
+    cursor.update_default_values_table( 'currency', int( number ) )
+    bot.redirect( '/record' )
 
 @bot.post( '/settings/num_of_rows' )
 def post_settings() :
@@ -235,7 +250,11 @@ def post_settings() :
     cursor.update_default_values_table( 'rows_in_1_insertion', str(number) )
     bot.redirect( '/record' )
 
-@bot.post( '/settings/add_currrency' )
+@bot.post( '/settings/add_currency' )
+def post_settings() :
+    pass
+
+@bot.post( '/settings/delete_currency' )
 def post_settings() :
     pass
 

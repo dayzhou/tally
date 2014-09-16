@@ -99,14 +99,31 @@ class TallyCursor( sqlite3.Cursor ) :
         self.execute( 'SELECT %s FROM currencies' % ','.join( what ) )
         return self.fetchall()
 
-    def get_from_tally_table( self, date ) :
+    def get_monthly_data_from_tally_table( self, date ) :
         self.execute( 'SELECT date,ware,html,cost,remark \
             FROM tally JOIN currencies ON tally.currency=currencies.curid \
-            WHERE date LIKE "%s%%"' % date
+            WHERE date LIKE "%s%%" \
+            ORDER BY date DESC' % date
         )
         return self.fetchall()
 
-    def group_get_from_tally_table( self, date ) :
+    def get_monthly_income_from_tally_table( self, date ) :
+        self.execute( 'SELECT html,sum(cost) \
+            FROM tally JOIN currencies ON tally.currency=currencies.curid \
+            WHERE date LIKE "%s%%" AND cost<0 \
+            GROUP BY currency' % date
+        )
+        return self.fetchall()
+
+    def get_monthly_expenses_from_tally_table( self, date ) :
+        self.execute( 'SELECT html,sum(cost) \
+            FROM tally JOIN currencies ON tally.currency=currencies.curid \
+            WHERE date LIKE "%s%%" AND cost>0 \
+            GROUP BY currency' % date
+        )
+        return self.fetchall()
+
+    def get_monthly_balance_from_tally_table( self, date ) :
         self.execute( 'SELECT html,sum(cost) \
             FROM tally JOIN currencies ON tally.currency=currencies.curid \
             WHERE date LIKE "%s%%" \

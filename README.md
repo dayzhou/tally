@@ -12,7 +12,7 @@ Tally is a _**web-based**_ program for recording everyday incomes and expenses. 
 
 2. Open a terminal in the unzipped directory
 
-3. Type command (may **NOT** work for python2):  
+3. Type command (works for python **2.7.8** as well):  
     > $python3 tally.py
    
     It will create a _sqlite_ database file _"tally.db"_ at **first run**

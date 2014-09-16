@@ -113,9 +113,27 @@
         </tr>
     % end
         <tr><td colspan=4></td></tr>
-        % for row in TotalTallyRows :
+        % for row in IncomeRows :
             <tr align=center>
-            <td width=100><font color=green>Total</font></td>
+            <td width=100><font color=green>Income</font></td>
+            <td width=200>-</td>
+            <td width=120><font color=green>{{!row.cost}}</font></td>
+            <td width=200>-</td>
+            </tr>
+        % end
+        <tr><td colspan=4></td></tr>
+        % for row in ExpensesRows :
+            <tr align=center>
+            <td width=100><font color=green>Expenses</font></td>
+            <td width=200>-</td>
+            <td width=120><font color=green>{{!row.cost}}</font></td>
+            <td width=200>-</td>
+            </tr>
+        % end
+        <tr><td colspan=4></td></tr>
+        % for row in BalanceRows :
+            <tr align=center>
+            <td width=100><font color=green>Balance</font></td>
             <td width=200>-</td>
             <td width=120><font color=green>{{!row.cost}}</font></td>
             <td width=200>-</td>
@@ -130,7 +148,7 @@
     <div class="right_box">
     <p>修改默认货币</p>
     <form method=post action="/settings/default_currency">
-        <table style="margin-top:10px; margin-bottom: 10px; border: 0px solid #3399FF;">
+        <table style="margin-top:10px; margin-bottom: 20px; border: 0px solid #3399FF;">
         <tr>
             <td width=100><select name=currency>
             % for c in AllCurrencies :
@@ -148,7 +166,7 @@
     
     <p>修改默认每次输入的记录数</p>
     <form method=post action="/settings/num_of_rows">
-        <table style="margin-top:10px; margin-bottom: 10px; border: 0px solid #3399FF;">
+        <table style="margin-top:10px; margin-bottom: 20px; border: 0px solid #3399FF;">
         <tr>
             <td width=100><select name=num_of_rows>
             % for i in range( 1, 11 ) :
@@ -166,7 +184,48 @@
     
     <p>添加新货币</p>
     <form method=post action="/settings/add_currency">
-        
+        <table style="margin-top:10px; margin-bottom: 20px; border: 0px solid #3399FF;">
+        <tr>
+            <td colspan=4><font color=red>remark</font></td>
+        </tr>
+        <tr>
+            <td width=110>货币名称</td>
+            <td width=120>符号</td>
+            <td width=130>HTML符号</td>
+            <td width=140>UNICODE符号</td>
+        </tr>
+        <tr>
+            <td><input type=text name=name size=8 value=''></td>
+            <td><input type=text name=symbol size=10 value=''></td>
+            <td><input type=text name=html size=12 value=''></td>
+            <td><input type=text name=unicode size=14 value=''></td>
+        </tr>
+        <tr>
+            <td colspan=2>英文全称</td>
+            <td colspan=2 rowspan=2 valign=bottom><input class="LoginButton" type=submit value='确定'></td>
+        </tr>
+        <tr>
+            <td colspan=2><input type=text name=description size=28 value=''></td>
+        </tr>
+        </table>
+    </form>
+    
+    <div style="border-bottom: 1px solid #3399FF; width: 300px;"></div>
+    
+    <p>删除货币</p>
+    <form method=post action="/settings/delete_currency">
+        <table style="margin-top:10px; margin-bottom: 20px; border: 0px solid #3399FF;">
+        <tr>
+            <td width=100><select name=currency>
+            % for c in AllCurrencies :
+                <option value={{c.curid}} {{'selected' if c.curid==currency else ''}}>{{!c.html}}
+            % end
+                </select>
+            </td>
+            <td width=50></td>
+            <td><input class="LoginButton" type=submit value='确定'></td>
+        </tr>
+        </table>
     </form>
     </div>
 % end
