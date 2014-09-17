@@ -1,10 +1,13 @@
 ### What needs to be done
 
 * sqlite3 Chinese display problem
-* functions: adding new currency, delete currency
+* functions: deleting currency
 * "/view" total balances (month/year view, whole)
 
 ### What has been done in v0.1
+
+* 2014-09-17  
+  add function: adding new currencies
 
 * 2014-09-16  
   fixed the bug that "/view" cost column only displays integers  

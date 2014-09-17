@@ -29,13 +29,27 @@ __DB_PATH__  = os.path.join( __SRC_DIR__, 'tally.db' )
 
 # =============================================
 class CCurrency :
-    """Currency class, contains valuesof 2 fields:
-        "curid"       : currency id
-        "html"        : the html code of the currency symbol
+    """Currency class, contains a dict 'members' which may have keys:
+        "curid", "name", "symbol", "html", "unicode", "description"
     """
-    def __init__( self, ct ) :
-        self.curid = ct[0]
-        self.html = ct[1]
+    def __init__( self, **members ) :
+        self.members = members
+        self.set_check_stat()
+    
+    def check( self ) :
+        keys = self.members.keys()
+        for key in ( 'name', 'symbol', 'html', 'uni', 'desc' ) :
+            if key not in keys :
+                return False
+            elif not self.members[key] :
+                return False
+        return True
+    
+    def set_check_stat( self, stat=True) :
+        self.CurrencyCheck = stat
+    
+    def get_check_stat( self ) :
+        return self.CurrencyCheck
 
 
 class CTally :
@@ -128,7 +142,7 @@ def get_default_currency() :
 
 
 def get_currencies_list() :
-    return [ CCurrency(curr) for curr in \
+    return [ CCurrency( curid=i, html=h ) for i,h in \
         cursor.get_from_currencies_table( 'curid', 'html' ) ]
 
 
@@ -235,6 +249,7 @@ def settings() :
         AllCurrencies = get_currencies_list(),
         currency = get_default_currency(),
         num_of_rows = get_default_number_of_rows_in_1_insertion(),
+        CurrencyToAdd = CCurrency(name='', symbol='', html='', uni='', desc=''),
     )
 
 
@@ -252,7 +267,25 @@ def post_settings() :
 
 @bot.post( '/settings/add_currency' )
 def post_settings() :
-    pass
+    currency2add = CCurrency(
+        name = bot.request.forms.get( 'name' ),
+        symbol = bot.request.forms.getunicode( 'symbol' ),
+        html = bot.request.forms.get( 'html' ),
+        uni = bot.request.forms.get( 'unicode' ),
+        desc = bot.request.forms.get( 'description' ),
+    )
+    if currency2add.check() and \
+        cursor.insert_into_currencies_table( **currency2add.members ) :
+        bot.redirect( '/view' )
+    else :
+        currency2add.set_check_stat( False )
+        return bot.template( 'tally',
+            operation = 'SETTINGS',
+            AllCurrencies = get_currencies_list(),
+            currency = get_default_currency(),
+            num_of_rows = get_default_number_of_rows_in_1_insertion(),
+            CurrencyToAdd = currency2add,
+        )
 
 @bot.post( '/settings/delete_currency' )
 def post_settings() :

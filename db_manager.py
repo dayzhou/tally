@@ -63,9 +63,13 @@ class TallyCursor( sqlite3.Cursor ) :
         self.create_tally_table()
 
     def insert_into_currencies_table( self, name, symbol, html, uni, desc ) :
-        self.execute( 'INSERT INTO currencies(name, symbol, html, uni, desc) \
-            VALUES(?,?,?,?,?)', (name,symbol,html,uni,desc) \
-        )
+        try :
+            self.execute( 'INSERT INTO currencies(name, symbol, html, unicode, description) \
+                VALUES(?,?,?,?,?)', (name,symbol,html,uni,desc) \
+            )
+            return True
+        except sqlite3.IntegrityError :
+            return False
 
     def insert_into_default_values_table( self, key, value ) :
         self.execute( 'INSERT INTO default_values VALUES(?,?)', (key,value) )

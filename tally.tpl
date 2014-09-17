@@ -49,7 +49,7 @@
             <td> &nbsp; 金额</td>
             <td><select name=currency{{i}}>
             % for c in AllCurrencies :
-                <option value={{c.curid}} {{'selected' if c.curid==row.currency else ''}}>{{!c.html}}
+                <option value={{c.members['curid']}} {{'selected' if c.members['curid']==row.currency else ''}}>{{!c.members['html']}}
             % end
                 </select>
                 <input type=text name=cost{{i}} size=10 value='{{row.cost}}'>
@@ -152,7 +152,7 @@
         <tr>
             <td width=100><select name=currency>
             % for c in AllCurrencies :
-                <option value={{c.curid}} {{'selected' if c.curid==currency else ''}}>{{!c.html}}
+                <option value={{c.members['curid']}} {{'selected' if c.members['curid']==currency else ''}}>{{!c.members['html']}}
             % end
                 </select>
             </td>
@@ -186,7 +186,7 @@
     <form method=post action="/settings/add_currency">
         <table style="margin-top:10px; margin-bottom: 20px; border: 0px solid #3399FF;">
         <tr>
-            <td colspan=4><font color=red>remark</font></td>
+            <td colspan=4><font color=red>{{'' if CurrencyToAdd.get_check_stat() else u'所有货币属性不可为空，且不可与已有货币重复'}}</font></td>
         </tr>
         <tr>
             <td width=110>货币名称</td>
@@ -195,17 +195,17 @@
             <td width=140>UNICODE符号</td>
         </tr>
         <tr>
-            <td><input type=text name=name size=8 value=''></td>
-            <td><input type=text name=symbol size=10 value=''></td>
-            <td><input type=text name=html size=12 value=''></td>
-            <td><input type=text name=unicode size=14 value=''></td>
+            <td><input type=text name=name size=8 value='{{CurrencyToAdd.members['name']}}'></td>
+            <td><input type=text name=symbol size=10 value='{{CurrencyToAdd.members['symbol']}}'></td>
+            <td><input type=text name=html size=12 value='{{CurrencyToAdd.members['html']}}'></td>
+            <td><input type=text name=unicode size=14 value='{{CurrencyToAdd.members['uni']}}'></td>
         </tr>
         <tr>
             <td colspan=2>英文全称</td>
             <td colspan=2 rowspan=2 valign=bottom><input class="LoginButton" type=submit value='确定'></td>
         </tr>
         <tr>
-            <td colspan=2><input type=text name=description size=28 value=''></td>
+            <td colspan=2><input type=text name=description size=28 value='{{CurrencyToAdd.members['desc']}}'></td>
         </tr>
         </table>
     </form>
@@ -218,7 +218,7 @@
         <tr>
             <td width=100><select name=currency>
             % for c in AllCurrencies :
-                <option value={{c.curid}} {{'selected' if c.curid==currency else ''}}>{{!c.html}}
+                <option value={{c.members['curid']}} {{'selected' if c.members['curid']==currency else ''}}>{{!c.members['html']}}
             % end
                 </select>
             </td>
