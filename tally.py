@@ -175,6 +175,12 @@ def get_all_years() :
         return [ CurYear ]
 
 # =============================================
+
+#@bot.route( '/favicon.ico' )
+def favicon() :
+    return
+
+
 @bot.route( '/' )
 @bot.route( '/record' )
 def record() :
@@ -263,7 +269,7 @@ def post_settings() :
 def post_settings() :
     number = bot.request.forms.get( 'num_of_rows' )
     cursor.update_default_values_table( 'rows_in_1_insertion', str(number) )
-    bot.redirect( '/record' )
+    bot.redirect( '/settings' )
 
 @bot.post( '/settings/add_currency' )
 def post_settings() :
@@ -276,7 +282,7 @@ def post_settings() :
     )
     if currency2add.check() and \
         cursor.insert_into_currencies_table( **currency2add.members ) :
-        bot.redirect( '/view' )
+        bot.redirect( '/settings' )
     else :
         currency2add.set_check_stat( False )
         return bot.template( 'tally',
@@ -289,7 +295,9 @@ def post_settings() :
 
 @bot.post( '/settings/delete_currency' )
 def post_settings() :
-    pass
+    currency = int( bot.request.forms.get( 'currency' ) )
+    cursor.delete_from_currencies_table( currency )
+    bot.redirect( '/settings' )
 
 # =============================================
 if __name__ == '__main__' :

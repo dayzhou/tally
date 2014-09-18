@@ -146,6 +146,9 @@ class TallyCursor( sqlite3.Cursor ) :
     def update_default_values_table( self, key, value ) :
         self.execute( 'UPDATE default_values SET value=? WHERE key=?', (value,key) )
 
+    def delete_from_currencies_table( self, curid ) :
+        self.execute( 'DELETE FROM currencies WHERE curid=?', (curid,) )
+
 
 def get_tally_connection() :
     try :
