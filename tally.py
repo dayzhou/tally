@@ -15,26 +15,47 @@ import os
 import re
 import datetime as dt
 import bottle as bot
+from functools import wraps
 from db_manager import *
 
 # =============================================
-__version__ = '0.1'
+
+__version__ = '0.2'
 __license__ = 'MIT'
 
 # =============================================
+
 __SRC_DIR__  = os.path.dirname( __file__ )
 __DB_PATH__  = os.path.join( __SRC_DIR__, 'tally.db' )
 #__CSS_PATH__ = os.path.join( __SRC_DIR__, 'tally.css' )
 #__TPL_PATH__ = os.path.join( __SRC_DIR__, 'tally.tpl' )
 
+if not os.path.exists( __DB_PATH__ ) :
+    with get_tally_connection( __DB_PATH__ ) as conn :
+        conn.cursor( TallyCursor ).create_all_tables()
+
 # =============================================
+
+def DBOperator( func ) :
+    """ A function decorator that sets initial connection to the
+        DB for further operation in the decorated functions
+    """
+    @wraps( func )
+    def __DBOperator( *args, **kws ) :
+        with get_tally_connection( __DB_PATH__ ) as conn :
+            result = func( conn.cursor( TallyCursor ), *args, **kws )	
+        return result
+    return __DBOperator
+
+# =============================================
+
 class CCurrency :
     """Currency class, contains a dict 'members' which may have keys:
         "curid", "name", "symbol", "html", "unicode", "description"
     """
     def __init__( self, **members ) :
         self.members = members
-        self.set_check_stat()
+        self.msg = ''
     
     def check( self ) :
         keys = self.members.keys()
@@ -44,12 +65,6 @@ class CCurrency :
             elif not self.members[key] :
                 return False
         return True
-    
-    def set_check_stat( self, stat=True) :
-        self.CurrencyCheck = stat
-    
-    def get_check_stat( self ) :
-        return self.CurrencyCheck
 
 
 class CTally :
@@ -126,47 +141,56 @@ class CInputRow :
         
         return evalidate
 
+# =============================================
 
-def get_default_number_of_rows_in_1_insertion() :
+@DBOperator
+def get_default_number_of_rows_in_1_insertion( cursor ) :
     try :
         return int( cursor.get_from_default_values_table( 'rows_in_1_insertion' ) )
     except :
         return 5
 
 
-def get_default_currency() :
+@DBOperator
+def get_default_currency( cursor ) :
     try :
         return int( cursor.get_from_default_values_table( 'currency' ) )
     except :
         return 1
 
 
-def get_currencies_list() :
+@DBOperator
+def get_currencies_list( cursor ) :
     return [ CCurrency( curid=i, html=h ) for i,h in \
         cursor.get_from_currencies_table( 'curid', 'html' ) ]
 
 
-def get_monthly_tally_list( date ) :
+@DBOperator
+def get_monthly_tally_list( cursor, date ) :
     return [ CTally(row) for row in \
         cursor.get_monthly_data_from_tally_table(date) ]
 
 
-def get_monthly_income_tally_list( date ) :
+@DBOperator
+def get_monthly_income_tally_list( cursor, date ) :
     return [ CTotalTally(row) for row in \
         cursor.get_monthly_income_from_tally_table(date) ]
 
 
-def get_monthly_expenses_tally_list( date ) :
+@DBOperator
+def get_monthly_expenses_tally_list( cursor, date ) :
     return [ CTotalTally(row) for row in \
         cursor.get_monthly_expenses_from_tally_table(date) ]
 
 
-def get_monthly_balance_tally_list( date ) :
+@DBOperator
+def get_monthly_balance_tally_list( cursor, date ) :
     return [ CTotalTally(row) for row in \
         cursor.get_monthly_balance_from_tally_table(date) ]
 
 
-def get_all_years() :
+@DBOperator
+def get_all_years( cursor ) :
     MinYear = cursor.get_minimal_year()
     CurYear = dt.date.today().year
     if MinYear :
@@ -174,12 +198,27 @@ def get_all_years() :
     else :
         return [ CurYear ]
 
+
+@DBOperator
+def update_default_values_table( cursor, key, value ) :
+    cursor.update_default_values_table( key, value )
+
+
+@DBOperator
+def insert_into_currencies_table( cursor, members ) :
+    return cursor.insert_into_currencies_table( **members )
+
+
+@DBOperator
+def delete_from_currencies_table( cursor, currency ) :
+    cursor.delete_from_currencies_table( currency )
+
+
+@DBOperator
+def insert_into_tally_table( cursor, row ) :
+    cursor.insert_into_tally_table( row=row )
+
 # =============================================
-
-#@bot.route( '/favicon.ico' )
-def favicon() :
-    return
-
 
 @bot.route( '/' )
 @bot.route( '/record' )
@@ -218,7 +257,7 @@ def post_record() :
         )
     else :
         for row in [ x for x in InputRows if not x.is_empty ] :
-            cursor.insert_into_tally_table( row=row )
+            insert_into_tally_table( row )
         bot.redirect( '/view' )
 
 
@@ -261,15 +300,17 @@ def settings() :
 
 @bot.post( '/settings/default_currency' )
 def post_settings() :
-    number = bot.request.forms.get( 'currency' )
-    cursor.update_default_values_table( 'currency', int( number ) )
-    bot.redirect( '/record' )
+    number = int( bot.request.forms.get( 'currency' ) )
+    update_default_values_table( 'currency', number )
+    bot.redirect( '/settings' )
+
 
 @bot.post( '/settings/num_of_rows' )
 def post_settings() :
-    number = bot.request.forms.get( 'num_of_rows' )
-    cursor.update_default_values_table( 'rows_in_1_insertion', str(number) )
+    number = str( bot.request.forms.get( 'num_of_rows' ) )
+    update_default_values_table( 'rows_in_1_insertion', number )
     bot.redirect( '/settings' )
+
 
 @bot.post( '/settings/add_currency' )
 def post_settings() :
@@ -280,31 +321,31 @@ def post_settings() :
         uni = bot.request.forms.get( 'unicode' ),
         desc = bot.request.forms.get( 'description' ),
     )
-    if currency2add.check() and \
-        cursor.insert_into_currencies_table( **currency2add.members ) :
-        bot.redirect( '/settings' )
+    
+    if currency2add.check() :
+        if insert_into_currencies_table( currency2add.members ) :
+            bot.redirect( '/settings' )
+        else :
+            currency2add.msg = u'不可与已有货币重复'
     else :
-        currency2add.set_check_stat( False )
-        return bot.template( 'tally',
-            operation = 'SETTINGS',
-            AllCurrencies = get_currencies_list(),
-            currency = get_default_currency(),
-            num_of_rows = get_default_number_of_rows_in_1_insertion(),
-            CurrencyToAdd = currency2add,
-        )
+        currency2add.msg = u'所有货币属性不可为空'
+
+    return bot.template( 'tally',
+        operation = 'SETTINGS',
+        AllCurrencies = get_currencies_list(),
+        currency = get_default_currency(),
+        num_of_rows = get_default_number_of_rows_in_1_insertion(),
+        CurrencyToAdd = currency2add,
+    )
+
 
 @bot.post( '/settings/delete_currency' )
 def post_settings() :
     currency = int( bot.request.forms.get( 'currency' ) )
-    cursor.delete_from_currencies_table( currency )
+    delete_from_currencies_table( currency )
     bot.redirect( '/settings' )
 
 # =============================================
 if __name__ == '__main__' :
-    DBExistence = os.path.exists( __DB_PATH__ )
-    with get_tally_connection() as conn :
-        cursor = conn.cursor( TallyCursor )
-        if not DBExistence :
-            cursor.create_all_tables()
-        bot.debug( True )
-        bot.run( host='localhost', port=50001, reloader=True )
+    bot.debug( True )
+    bot.run( host='localhost', port=50001, reloader=True )

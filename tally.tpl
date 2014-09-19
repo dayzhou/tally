@@ -182,7 +182,7 @@
     <form method=post action="/settings/add_currency">
         <table style="margin-top:10px; margin-bottom: 20px; border: 0px solid #3399FF;">
         <tr>
-            <td colspan=4><font color=red>{{'' if CurrencyToAdd.get_check_stat() else u'所有货币属性不可为空，且不可与已有货币重复'}}</font></td>
+            <td colspan=4><font color=red>{{CurrencyToAdd.msg}}</font></td>
         </tr>
         <tr>
             <td width=110>货币名称</td>

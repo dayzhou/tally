@@ -150,11 +150,8 @@ class TallyCursor( sqlite3.Cursor ) :
         self.execute( 'DELETE FROM currencies WHERE curid=?', (curid,) )
 
 
-def get_tally_connection() :
-    try :
-        return sqlite3.connect( 'tally.db' )
-    except :
-        sys.exit()
+def get_tally_connection( DBFile ) :
+    return sqlite3.connect( DBFile )
 
 ########################################## Table row classes
 
@@ -257,5 +254,5 @@ class _TallyCmd ( cmd.Cmd ) :
 ##########################################
 
 if __name__ == '__main__' :
-    with get_tally_connection() as _conn :
+    with get_tally_connection( 'tally.db' ) as _conn :
         _TallyCmd( _conn.cursor( TallyCursor ) ).cmdloop()

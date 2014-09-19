@@ -1,10 +1,19 @@
 ### What needs to be done
 
 * sqlite3 Chinese display problem
-* functions: deleting currency
+* view default_values/currencies table
 * "/view" total balances (month/year view, whole)
 
+### What has been done in v0.2
+
+* 2014-09-20  
+  use a function decorate to do db transactions so that it commits after every operation
+* 
+
 ### What has been done in v0.1
+
+* 2014-09-18  
+  add function: deleting currencies
 
 * 2014-09-17  
   add function: adding new currencies
