@@ -348,4 +348,4 @@ def post_settings() :
 # =============================================
 if __name__ == '__main__' :
     bot.debug( True )
-    bot.run( host='localhost', port=50001, reloader=True )
+    bot.run( server=bot.CherryPyServer, host='localhost', port=50001, reloader=True )

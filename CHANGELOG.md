@@ -6,9 +6,12 @@
 
 ### What has been done in v0.2
 
+* 2014-09-21  
+  Try to use apache with bottle but failed  
+  change server to CherryPyServer instead
+
 * 2014-09-20  
   use a function decorate to do db transactions so that it commits after every operation
-* 
 
 ### What has been done in v0.1
 
