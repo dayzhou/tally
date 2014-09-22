@@ -1,6 +1,7 @@
 ### What needs to be done
 
 * sqlite3 Chinese display problem
+* delete tally entries
 * view default_values/currencies table
 * "/view" total balances (month/year view, whole)
 

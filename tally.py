@@ -28,7 +28,7 @@ __license__ = 'MIT'
 __SRC_DIR__  = os.path.dirname( __file__ )
 __DB_PATH__  = os.path.join( __SRC_DIR__, 'tally.db' )
 #__CSS_PATH__ = os.path.join( __SRC_DIR__, 'tally.css' )
-#__TPL_PATH__ = os.path.join( __SRC_DIR__, 'tally.tpl' )
+__TEMPLATE__ = os.path.join( __SRC_DIR__, 'tally' )
 
 if not os.path.exists( __DB_PATH__ ) :
     with get_tally_connection( __DB_PATH__ ) as conn :
@@ -226,7 +226,7 @@ def record() :
     InputRows = get_default_number_of_rows_in_1_insertion() * \
         [ CInputRow( currency=get_default_currency() ) ]
     
-    return bot.template( 'tally',
+    return bot.template( __TEMPLATE__,
         operation = 'RECORD',
         AllCurrencies = get_currencies_list(),
         InputRows = InputRows,
@@ -250,7 +250,7 @@ def post_record() :
     ]
     
     if False in [ row.check_and_format() for row in InputRows ] :
-        return bot.template( 'tally',
+        return bot.template( __TEMPLATE__,
             operation = 'RECORD',
             AllCurrencies = get_currencies_list(),
             InputRows = InputRows,
@@ -268,7 +268,7 @@ def view( date=None ) :
         today = dt.date.today()
         date = '%d-%02d' % ( today.year, today.month )
 
-    return bot.template( 'tally',
+    return bot.template( __TEMPLATE__,
         operation = 'VIEW',
         year = date[:4],
         month = date[-2:],
@@ -289,7 +289,7 @@ def post_view() :
 
 @bot.route( '/settings' )
 def settings() :
-    return bot.template( 'tally',
+    return bot.template( __TEMPLATE__,
         operation = 'SETTINGS',
         AllCurrencies = get_currencies_list(),
         currency = get_default_currency(),
@@ -330,7 +330,7 @@ def post_settings() :
     else :
         currency2add.msg = u'所有货币属性不可为空'
 
-    return bot.template( 'tally',
+    return bot.template( __TEMPLATE__,
         operation = 'SETTINGS',
         AllCurrencies = get_currencies_list(),
         currency = get_default_currency(),
@@ -348,4 +348,4 @@ def post_settings() :
 # =============================================
 if __name__ == '__main__' :
     bot.debug( True )
-    bot.run( server=bot.CherryPyServer, host='localhost', port=50001, reloader=True )
+    bot.run( host='localhost', port=50001, reloader=True )

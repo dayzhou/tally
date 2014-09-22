@@ -67,7 +67,7 @@
         </tr>
     % end
         </table>
-        <input class="LoginButton" type=submit value='提交'>
+        <input class="Button" type=submit value='提交'>
     </form>
 % end
 
@@ -88,7 +88,7 @@
             % end
                 </select>
             </td>
-            <td><input class="LoginButton" type=submit value='查询'></td>
+            <td><input class="Button" type=submit value='查询'></td>
         </tr>
         </table>
     </form>
@@ -153,7 +153,7 @@
                 </select>
             </td>
             <td width=50></td>
-            <td><input class="LoginButton" type=submit value='确定'></td>
+            <td><input class="Button" type=submit value='确定'></td>
         </tr>
         </table>
     </form>
@@ -171,7 +171,7 @@
                 </select>
             </td>
             <td width=50></td>
-            <td><input class="LoginButton" type=submit value='确定'></td>
+            <td><input class="Button" type=submit value='确定'></td>
         </tr>
         </table>
     </form>
@@ -198,7 +198,7 @@
         </tr>
         <tr>
             <td colspan=2>英文全称</td>
-            <td colspan=2 rowspan=2 valign=bottom><input class="LoginButton" type=submit value='确定'></td>
+            <td colspan=2 rowspan=2 valign=bottom><input class="Button" type=submit value='确定'></td>
         </tr>
         <tr>
             <td colspan=2><input type=text name=description size=28 value='{{CurrencyToAdd.members['desc']}}'></td>
@@ -220,7 +220,7 @@
                 </select>
             </td>
             <td width=50></td>
-            <td><input class="LoginButton" type=submit value='确定'></td>
+            <td><input class="Button" type=submit value='确定'></td>
         </tr>
         </table>
     </form>
