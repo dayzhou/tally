@@ -44,25 +44,24 @@
         </tr>
         <tr>
             <td>商品</td>
-            <td><input type=text name=ware{{i}} size=25 value='{{row.ware}}'></td>
+            <td><input class="TextInput" type=text name=ware{{i}} size=25 value='{{row.ware}}'></td>
             
             <td> &nbsp; 金额</td>
-            <td><select name=currency{{i}}>
+            <td><select class="Select" name=currency{{i}}>
             % for c in AllCurrencies :
                 <option value={{c.members['curid']}} {{'selected' if c.members['curid']==row.currency else ''}}>{{!c.members['html']}}
             % end
                 </select>
-                <input type=text name=cost{{i}} size=10 value='{{row.cost}}'>
+                <input class="TextInput" type=text name=cost{{i}} size=10 value='{{row.cost}}'>
             </td>
             
             <td> &nbsp; 备注</td>
-            <td><input type=text name=remark{{i}} size=30 value='{{row.remark}}'></td>
+            <td><input class="TextInput" type=text name=remark{{i}} size=30 value='{{row.remark}}'></td>
             
-        % year, month, day = row.date.split('-')
             <td> &nbsp; 日期</td>
-            <td><input type=text name=year{{i}} size=4 value='{{year}}'> -
-                <input type=text name=month{{i}} size=2 value='{{month}}'> -
-                <input type=text name=day{{i}} size=2 value='{{day}}'>
+            <td><input class="TextInput" type=text name=year{{i}} size=4 value='{{row.year}}'> -
+                <input class="TextInput" type=text name=month{{i}} size=2 value='{{row.month}}'> -
+                <input class="TextInput" type=text name=day{{i}} size=2 value='{{row.day}}'>
             </td>
         </tr>
     % end
@@ -77,12 +76,12 @@
         <table style="margin-top:10px; margin-bottom: 10px; border: 0px solid #3399FF;">
         <tr>
             <td width=100><font size=3 color=#3399FF>选择年月</font></td>
-            <td width=200><select name=year>
+            <td width=200><select class="Select" name=year>
             % for y in AllYears :
                 <option {{'selected' if y==year else ''}}>{{y}}
             % end
                 </select>
-                <select name=month>
+                <select class="Select" name=month>
             % for m in [ '%02d' % mo for mo in range(1,13) ] :
                 <option {{'selected' if m==month else ''}}>{{m}}
             % end
@@ -95,12 +94,13 @@
     
     <div style="border-bottom: 1px solid #3399FF; width: 400px;"></div>
     
-    <table class="table_border" style="margin-top:20px;">
+    <table class="table_border" style="margin-top:20px; margin-bottom: 20px;">
         <tr align=center>
             <td width=100>日期</td>
             <td width=200>商品</td>
             <td width=120>金额</td>
             <td width=200>备忘</td>
+            <td width=100>操作</td>
         </tr>
     % for row in TallyRows :
         <tr align=center>
@@ -108,33 +108,43 @@
             <td width=200>{{row.ware}}</td>
             <td width=120>{{!row.cost}}</td>
             <td width=200>{{row.remark}}</td>
+            <td>
+                <form method=post action="/view_delete">
+                    <input type=hidden name=date value='{{ "%s-%s" % (year,month) }}'>
+                    <input type=hidden name=delete value='{{row.talid}}'>
+                    <input class="TableButton" type=submit value='删除'>
+                </form>
+            </td>
         </tr>
     % end
-        <tr><td colspan=4></td></tr>
+        <tr><td colspan=5></td></tr>
         % for row in IncomeRows :
             <tr align=center>
             <td width=100><font color=green>Income</font></td>
-            <td width=200>-</td>
+            <td>-</td>
             <td width=120><font color=green>{{!row.cost}}</font></td>
-            <td width=200>-</td>
+            <td>-</td>
+            <td>-</td>
             </tr>
         % end
-        <tr><td colspan=4></td></tr>
+        <tr><td colspan=5></td></tr>
         % for row in ExpensesRows :
             <tr align=center>
             <td width=100><font color=green>Expenses</font></td>
-            <td width=200>-</td>
+            <td>-</td>
             <td width=120><font color=green>{{!row.cost}}</font></td>
-            <td width=200>-</td>
+            <td>-</td>
+            <td>-</td>
             </tr>
         % end
-        <tr><td colspan=4></td></tr>
+        <tr><td colspan=5></td></tr>
         % for row in BalanceRows :
             <tr align=center>
             <td width=100><font color=green>Balance</font></td>
-            <td width=200>-</td>
+            <td>-</td>
             <td width=120><font color=green>{{!row.cost}}</font></td>
-            <td width=200>-</td>
+            <td>-</td>
+            <td>-</td>
             </tr>
         % end
     </table>
@@ -146,7 +156,7 @@
     <form method=post action="/settings/default_currency">
         <table style="margin-top:10px; margin-bottom: 20px; border: 0px solid #3399FF;">
         <tr>
-            <td width=100><select name=currency>
+            <td width=100><select class="Select" name=currency>
             % for c in AllCurrencies :
                 <option value={{c.members['curid']}} {{'selected' if c.members['curid']==currency else ''}}>{{!c.members['html']}}
             % end
@@ -164,7 +174,7 @@
     <form method=post action="/settings/num_of_rows">
         <table style="margin-top:10px; margin-bottom: 20px; border: 0px solid #3399FF;">
         <tr>
-            <td width=100><select name=num_of_rows>
+            <td width=100><select class="Select" name=num_of_rows>
             % for i in range( 1, 11 ) :
                 <option {{'selected' if i==num_of_rows else ''}}>{{i}}
             % end
@@ -191,17 +201,17 @@
             <td width=140>UNICODE符号</td>
         </tr>
         <tr>
-            <td><input type=text name=name size=8 value='{{CurrencyToAdd.members['name']}}'></td>
-            <td><input type=text name=symbol size=10 value='{{CurrencyToAdd.members['symbol']}}'></td>
-            <td><input type=text name=html size=12 value='{{CurrencyToAdd.members['html']}}'></td>
-            <td><input type=text name=unicode size=14 value='{{CurrencyToAdd.members['uni']}}'></td>
+            <td><input class="TextInput" type=text name=name size=8 value='{{CurrencyToAdd.members['name']}}'></td>
+            <td><input class="TextInput" type=text name=symbol size=10 value='{{CurrencyToAdd.members['symbol']}}'></td>
+            <td><input class="TextInput" type=text name=html size=12 value='{{CurrencyToAdd.members['html']}}'></td>
+            <td><input class="TextInput" type=text name=unicode size=14 value='{{CurrencyToAdd.members['uni']}}'></td>
         </tr>
         <tr>
             <td colspan=2>英文全称</td>
             <td colspan=2 rowspan=2 valign=bottom><input class="Button" type=submit value='确定'></td>
         </tr>
         <tr>
-            <td colspan=2><input type=text name=description size=28 value='{{CurrencyToAdd.members['desc']}}'></td>
+            <td colspan=2><input class="TextInput" type=text name=description size=28 value='{{CurrencyToAdd.members['desc']}}'></td>
         </tr>
         </table>
     </form>
@@ -212,7 +222,7 @@
     <form method=post action="/settings/delete_currency">
         <table style="margin-top:10px; margin-bottom: 20px; border: 0px solid #3399FF;">
         <tr>
-            <td width=100><select name=currency>
+            <td width=100><select class="Select" name=currency>
                 <option value=0> (.^__^.)
             % for c in AllCurrencies :
                 <option value={{c.members['curid']}}>{{!c.members['html']}}

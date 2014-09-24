@@ -104,7 +104,7 @@ class TallyCursor( sqlite3.Cursor ) :
         return self.fetchall()
 
     def get_monthly_data_from_tally_table( self, date ) :
-        self.execute( 'SELECT date,ware,html,cost,remark \
+        self.execute( 'SELECT talid,date,ware,html,cost,remark \
             FROM tally JOIN currencies ON tally.currency=currencies.curid \
             WHERE date LIKE "%s%%" \
             ORDER BY date DESC' % date
@@ -148,6 +148,9 @@ class TallyCursor( sqlite3.Cursor ) :
 
     def delete_from_currencies_table( self, curid ) :
         self.execute( 'DELETE FROM currencies WHERE curid=?', (curid,) )
+
+    def delete_from_tally_table( self, talid ) :
+        self.execute( 'DELETE FROM tally WHERE talid=?', (talid,) )
 
 
 def get_tally_connection( DBFile ) :

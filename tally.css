@@ -107,3 +107,59 @@ td{
     position:relative;
     top:1px;
 }
+
+
+.TextInput {
+    background-color:#ffffff;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:5px;
+    border:1px solid #87d2fa;
+    display:inline-block;
+    color:#000000;
+    font-family:Trebuchet MS;
+    font-size:14px;
+    padding:2px 5px;
+    text-decoration:none;
+}
+
+
+.Select {
+    background-color:#ffffff;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px;
+    border:1px solid #87d2fa;
+    display:inline-block;
+    cursor:pointer;
+    color:#000000;
+    font-family:Trebuchet MS;
+    font-size:13px;
+    padding:3px 10px;
+    text-decoration:none;
+}
+
+
+.TableButton {
+    background-color:#ffffff;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius: 7px;
+    border:1px solid #87d2fa;
+    display:inline-block;
+    cursor:pointer;
+    color:#000000;
+    font-family:Trebuchet MS;
+    font-size:12px;
+    padding:1px 12px;
+    text-decoration:none;
+}
+
+.TableButton:hover {
+    background-color:#dbf1ff;
+}
+
+.TableButton:active {
+    position:relative;
+    top:1px;
+}

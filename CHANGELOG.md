@@ -1,11 +1,15 @@
 ### What needs to be done
 
 * sqlite3 Chinese display problem
-* delete tally entries
+* daily cost view in a month
 * view default_values/currencies table
 * "/view" total balances (month/year view, whole)
 
 ### What has been done in v0.2
+
+* 2014-09-24  
+  change server back to bottle default server  
+  add function: deleting tally entries
 
 * 2014-09-21  
   Try to use apache with bottle but failed  

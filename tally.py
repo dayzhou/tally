@@ -75,10 +75,11 @@ class CTally :
         "remark" : notes for memo
     """
     def __init__( self, tt ) :
-        self.date = tt[0]
-        self.ware = tt[1]
-        self.cost = '%s %g' % ( tt[2], tt[3] )
-        self.remark = tt[4]
+        self.talid = tt[0]
+        self.date = tt[1]
+        self.ware = tt[2]
+        self.cost = '%s %g' % ( tt[3], tt[4] )
+        self.remark = tt[5]
 
 
 class CTotalTally :
@@ -89,17 +90,21 @@ class CTotalTally :
 
 
 class CInputRow :
-    """Input row class, contains 6 fields:
-        "date"     : date on which money are spent
+    """Input row class, contains 8 fields:
+        "year"     : year in which money are spent
+        "month"    : month in which money are spent
+        "day"      : day in which money are spent
         "ware"     : the ware the money is spent for
         "currency" : currency (money)
         "cost"     : money the ware costs
         "remark"   : notes for memo
         "msg"      : message for invalid input
     """
-    def __init__( self, date='', ware='', currency=1, cost='', remark='' ) :
+    def __init__( self, year='', month='', day='', ware='', currency=1, cost='', remark='' ) :
         today = dt.date.today()
-        self.date = date or '%d-%02d-%02d' % (today.year,today.month,today.day)
+        self.year = year or today.year
+        self.month = month or today.month
+        self.day = day or today.day
         self.ware = ware
         self.currency = currency
         self.cost = cost
@@ -129,7 +134,7 @@ class CInputRow :
             evalidate = False
 
         try :
-            ymd = [ int(x) for x in self.date.split('-') ]
+            ymd = [ int(self.year), int(self.month), int(self.day) ]
             if dt.date( *ymd ) > dt.date.today() :
                 self.msg['date'] = u'不能填写未来的日期'
                 evalidate = False
@@ -215,6 +220,11 @@ def delete_from_currencies_table( cursor, currency ) :
 
 
 @DBOperator
+def delete_from_tally_table( cursor, talid ) :
+    cursor.delete_from_tally_table( talid )
+
+
+@DBOperator
 def insert_into_tally_table( cursor, row ) :
     cursor.insert_into_tally_table( row=row )
 
@@ -237,10 +247,9 @@ def record() :
 def post_record() :
     InputRows = [
         CInputRow(
-            date = '-'.join(
-                [ bot.request.forms.get( '%s%d' % (x,i) )
-                    for x in ('year','month','day') ]
-            ),
+            year = bot.request.forms.get( 'year%d' % i ),
+            month = bot.request.forms.get( 'month%d' % i ),
+            day = bot.request.forms.get( 'day%d' % i ),
             ware = bot.request.forms.get( 'ware%d' % i ),
             currency = int( bot.request.forms.get( 'currency%d' % i ) ),
             cost = bot.request.forms.get( 'cost%d' % i ),
@@ -285,6 +294,14 @@ def post_view() :
     year = bot.request.forms.get( 'year' )
     month = bot.request.forms.get( 'month' )
     bot.redirect( '/view/%s-%s' % (year,month) )
+
+
+@bot.post( '/view_delete' )
+def post_view_delete() :
+    talid = int( bot.request.forms.get( 'delete' ) )
+    date = bot.request.forms.get( 'date' )
+    delete_from_tally_table( talid )
+    bot.redirect( '/view/%s' % date )
 
 
 @bot.route( '/settings' )
