@@ -91,13 +91,17 @@ class TallyCursor( sqlite3.Cursor ) :
                 VALUES(?,?,?,?)', (ware,currency,cost,remark) \
             )
 
-    def get_from_default_values_table( self, key ) :
-        self.execute( 'SELECT value FROM default_values WHERE key=?', (key,) )
-        value = self.fetchone()
-        if value :
-            return value[0]
+    def get_from_default_values_table( self, key=None ) :
+        if key :
+            self.execute( 'SELECT value FROM default_values WHERE key=?', (key,) )
+            value = self.fetchone()
+            if value :
+                return value[0]
+            else :
+                return None
         else :
-            return None
+            self.execute( 'SELECT * FROM default_values' )
+            return self.fetchall()
 
     def get_from_currencies_table( self, *what ) :
         self.execute( 'SELECT %s FROM currencies' % ','.join( what ) )
@@ -158,23 +162,23 @@ def get_tally_connection( DBFile ) :
 
 ########################################## Table row classes
 
-class Currency :
-    """The currency class, collecting information about one kind of currency
-    """
-    def __init__( self, curid=0, name='' ) :
-        if curid :
-            _cursor.execute( 'SELECT * FROM currencies WHERE curid=?', (curid,) )
-            currency = _cursor.fetchall()
-        elif name :
-            _cursor.execute( 'SELECT * FROM currencies WHERE name=?', (name,) )
-            currency = _cursor.fetchall()
-
-        if currency :
-            self.curid, self.name, self.symbol, self.html, \
-                self.unicode, self.description = currency[0]
-            self.existence = True
-        else :
-            self.existence = False
+#class Currency :
+#    """The currency class, collecting information about one kind of currency
+#    """
+#    def __init__( self, curid=0, name='' ) :
+#        if curid :
+#            _cursor.execute( 'SELECT * FROM currencies WHERE curid=?', (curid,) )
+#            currency = _cursor.fetchall()
+#        elif name :
+#            _cursor.execute( 'SELECT * FROM currencies WHERE name=?', (name,) )
+#            currency = _cursor.fetchall()
+#
+#        if currency :
+#            self.curid, self.name, self.symbol, self.html, \
+#                self.unicode, self.description = currency[0]
+#            self.existence = True
+#        else :
+#            self.existence = False
 
 ##########################################
 

@@ -2,10 +2,12 @@
 
 * sqlite3 Chinese display problem
 * daily cost view in a month
-* view default_values/currencies table
 * "/view" total balances (month/year view, whole)
 
 ### What has been done in v0.2
+
+* 2014-09-25  
+  add functions: viewing default_values/currencies table
 
 * 2014-09-24  
   change server back to bottle default server  

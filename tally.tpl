@@ -13,8 +13,10 @@
 
 <div class="left">
     <div class="left_box">
-        <p><a href="/record">记账啦</a></p>
+        <p><a href="/record">灌水啦</a></p>
         <p><a href="/view">查水表</a></p>
+        <p><a href="/defaults">查默表</a></p>
+        <p><a href="/currencies">查币表</a></p>
         <p><a href="/settings">设置</a></p>
     </div>
 </div>
@@ -234,6 +236,52 @@
         </tr>
         </table>
     </form>
+% end
+
+
+% if operation == 'DEFAULTS' :
+    <p><font size=3 color=#3399FF>默认值表</font></p>
+    <div style="border-bottom: 1px solid #3399FF; width: 300px;"></div>
+    
+    <table class="table_border" style="margin-top:20px; margin-bottom: 20px;">
+        <tr align=center>
+            <td width=200>KEY</td>
+            <td width=150>VALUE</td>
+        </tr>
+    % for d in default_values :
+        <tr align=center>
+            <td>{{d.key}}</td>
+            <td>{{d.value}}</td>
+        </tr>
+    % end
+    </table>
+% end
+
+
+% if operation == 'CURRENCIES' :
+    <p><font size=3 color=#3399FF>货币表</font></p>
+    <div style="border-bottom: 1px solid #3399FF; width: 300px;"></div>
+    
+    <table class="table_border" style="margin-top:20px; margin-bottom: 20px;">
+        <tr align=center>
+            <td width=50>ID</td>
+            <td width=100>货币名称</td>
+            <td width=100>货币符号</td>
+            <td width=100>HTML</td>
+            <td width=100>UNICODE</td>
+            <td width=200>货币全称</td>
+        </tr>
+    % for c in currencies :
+        <tr align=center>
+            <td>{{c.members['curid']}}</td>
+            <td>{{c.members['name']}}</td>
+            <td>{{c.members['symbol']}}</td>
+            <td>{{c.members['html']}}</td>
+            <td>{{c.members['uni']}}</td>
+            <td>{{c.members['desc']}}</td>
+        </tr>
+    % end
+    </table>
 % end
 
 </div>

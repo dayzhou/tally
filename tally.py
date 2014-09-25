@@ -49,6 +49,15 @@ def DBOperator( func ) :
 
 # =============================================
 
+class CDefault :
+    """Default value class, contains 2 fields:
+        "key" and "value"
+    """
+    def __init__( self, k, v ) :
+        self.key = k
+        self.value = v
+
+
 class CCurrency :
     """Currency class, contains a dict 'members' which may have keys:
         "curid", "name", "symbol", "html", "unicode", "description"
@@ -165,9 +174,24 @@ def get_default_currency( cursor ) :
 
 
 @DBOperator
+def get_default_values_list( cursor ) :
+    return [ CDefault(k,v) for k,v in cursor.get_from_default_values_table() ]
+
+
+@DBOperator
 def get_currencies_list( cursor ) :
     return [ CCurrency( curid=i, html=h ) for i,h in \
         cursor.get_from_currencies_table( 'curid', 'html' ) ]
+
+
+@DBOperator
+def get_currencies_table_list( cursor ) :
+    return [ CCurrency( curid=i, name=n, symbol=s, html=h, uni=u, desc=d ) \
+        for i,n,s,h,u,d in \
+        cursor.get_from_currencies_table( \
+            'curid', 'name', 'symbol', 'html', 'unicode', 'description' \
+        ) \
+    ]
 
 
 @DBOperator
@@ -361,6 +385,22 @@ def post_settings() :
     currency = int( bot.request.forms.get( 'currency' ) )
     delete_from_currencies_table( currency )
     bot.redirect( '/settings' )
+
+
+@bot.route( '/defaults' )
+def defaults() :
+    return bot.template( __TEMPLATE__,
+        operation = 'DEFAULTS',
+        default_values = get_default_values_list(),
+    )
+
+
+@bot.route( '/currencies' )
+def currencies() :
+    return bot.template( __TEMPLATE__,
+        operation = 'CURRENCIES',
+        currencies = get_currencies_table_list(),
+    )
 
 # =============================================
 if __name__ == '__main__' :
