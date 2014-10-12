@@ -78,7 +78,7 @@
         <table style="margin-top:10px; margin-bottom: 10px; border: 0px solid #3399FF;">
         <tr>
             <td width=100><font size=3 color=#3399FF>选择年月</font></td>
-            <td width=200><select class="Select" name=year>
+            <td width=180><select class="Select" name=year>
             % for y in AllYears :
                 <option {{'selected' if y==year else ''}}>{{y}}
             % end
@@ -89,27 +89,73 @@
             % end
                 </select>
             </td>
-            <td><input class="Button" type=submit value='查询'></td>
+            <td width=150><input class="Button" type=checkbox name='daily'> Daily View</td>
+            <td width=120><input class="Button" type=submit value='查询'></td>
         </tr>
         </table>
     </form>
     
-    <div style="border-bottom: 1px solid #3399FF; width: 400px;"></div>
+    <div style="border-bottom: 1px solid #3399FF; width: 550px;"></div>
     
     <table class="table_border" style="margin-top:20px; margin-bottom: 20px;">
         <tr align=center>
             <td width=100>日期</td>
+        % if not daily :
             <td width=200>商品</td>
-            <td width=120>金额</td>
+        % end
+            <td width=150>金额</td>
+        % if not daily :
             <td width=200>备忘</td>
             <td width=100>操作</td>
+        % end
         </tr>
+        % if not daily :
+            % for row in IncomeRows :
+            <tr align=center>
+                <td><font color=green>Income</font></td>
+                <td>-</td>
+                <td><font color=green>{{!row.cost}}</font></td>
+                <td>-</td>
+                <td>-</td>
+            </tr>
+            % end
+            <tr><td colspan={{5 if not daily else 2}}></td></tr>
+        % end
+        % for row in ExpensesRows :
+            <tr align=center>
+                <td><font color=green>Expenses</font></td>
+            % if not daily :
+                <td>-</td>
+            % end
+                <td><font color=green>{{!row.cost}}</font></td>
+            % if not daily :
+                <td>-</td>
+                <td>-</td>
+            % end
+            </tr>
+        % end
+        % if not daily :
+        <tr><td colspan={{5 if not daily else 2}}></td></tr>
+            % for row in BalanceRows :
+            <tr align=center>
+                <td><font color=green>Balance</font></td>
+                <td>-</td>
+                <td><font color=green>{{!row.cost}}</font></td>
+                <td>-</td>
+                <td>-</td>
+            </tr>
+            % end
+        % end
+        <tr><td colspan={{5 if not daily else 2}}></td></tr>
     % for row in TallyRows :
         <tr align=center>
-            <td width=100>{{row.date}}</td>
-            <td width=200>{{row.ware}}</td>
-            <td width=120>{{!row.cost}}</td>
-            <td width=200>{{row.remark}}</td>
+            <td>{{row.date}}</td>
+        % if not daily :
+            <td>{{row.ware}}</td>
+        % end
+            <td>{{!row.cost}}</td>
+        % if not daily :
+            <td>{{row.remark}}</td>
             <td>
                 <form method=post action="/view_delete">
                     <input type=hidden name=date value='{{ "%s-%s" % (year,month) }}'>
@@ -117,38 +163,9 @@
                     <input class="TableButton" type=submit value='删除'>
                 </form>
             </td>
+        % end
         </tr>
     % end
-        <tr><td colspan=5></td></tr>
-        % for row in IncomeRows :
-            <tr align=center>
-            <td width=100><font color=green>Income</font></td>
-            <td>-</td>
-            <td width=120><font color=green>{{!row.cost}}</font></td>
-            <td>-</td>
-            <td>-</td>
-            </tr>
-        % end
-        <tr><td colspan=5></td></tr>
-        % for row in ExpensesRows :
-            <tr align=center>
-            <td width=100><font color=green>Expenses</font></td>
-            <td>-</td>
-            <td width=120><font color=green>{{!row.cost}}</font></td>
-            <td>-</td>
-            <td>-</td>
-            </tr>
-        % end
-        <tr><td colspan=5></td></tr>
-        % for row in BalanceRows :
-            <tr align=center>
-            <td width=100><font color=green>Balance</font></td>
-            <td>-</td>
-            <td width=120><font color=green>{{!row.cost}}</font></td>
-            <td>-</td>
-            <td>-</td>
-            </tr>
-        % end
     </table>
 % end
 

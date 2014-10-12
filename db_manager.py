@@ -114,6 +114,15 @@ class TallyCursor( sqlite3.Cursor ) :
             ORDER BY date DESC' % date
         )
         return self.fetchall()
+    
+    def get_monthly_data_of_daily_view_from_tally_table( self, date ) :
+        self.execute( 'SELECT 0,date,NULL,html,sum(cost),NULL \
+            FROM tally JOIN currencies ON tally.currency=currencies.curid \
+            WHERE date LIKE "%s%%" and cost > 0 \
+            GROUP BY currency,date \
+            ORDER BY date DESC' % date
+        )
+        return self.fetchall()
 
     def get_monthly_income_from_tally_table( self, date ) :
         self.execute( 'SELECT html,sum(cost) \

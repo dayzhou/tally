@@ -201,6 +201,12 @@ def get_monthly_tally_list( cursor, date ) :
 
 
 @DBOperator
+def get_monthly_tally_list_of_daily_view( cursor, date ) :
+    return [ CTally(row) for row in \
+        cursor.get_monthly_data_of_daily_view_from_tally_table(date) ]
+
+
+@DBOperator
 def get_monthly_income_tally_list( cursor, date ) :
     return [ CTotalTally(row) for row in \
         cursor.get_monthly_income_from_tally_table(date) ]
@@ -303,21 +309,39 @@ def view( date=None ) :
 
     return bot.template( __TEMPLATE__,
         operation = 'VIEW',
+        daily = False,
         year = date[:4],
         month = date[-2:],
         AllYears = get_all_years(),
         TallyRows = get_monthly_tally_list( date ),
         IncomeRows = get_monthly_income_tally_list( date ),
         ExpensesRows = get_monthly_expenses_tally_list( date ),
-        BalanceRows = get_monthly_balance_tally_list( date ),
-    )
+        BalanceRows = get_monthly_balance_tally_list( date ) )
+
+
+@bot.route( '/daily-view/<date:re:20[0-9][0-9]-(0[1-9]|1[0-2])>' )
+def daily_view( date ) :
+    return bot.template( __TEMPLATE__,
+        operation = 'VIEW',
+        daily = True,
+        year = date[:4],
+        month = date[-2:],
+        AllYears = get_all_years(),
+        TallyRows = get_monthly_tally_list_of_daily_view( date ),
+        IncomeRows = get_monthly_income_tally_list( date ),
+        ExpensesRows = get_monthly_expenses_tally_list( date ),
+        BalanceRows = get_monthly_balance_tally_list( date ) )
 
 
 @bot.post( '/view' )
 def post_view() :
     year = bot.request.forms.get( 'year' )
     month = bot.request.forms.get( 'month' )
-    bot.redirect( '/view/%s-%s' % (year,month) )
+    daily = bot.request.forms.get( 'daily' )
+    if daily == 'on' :
+        bot.redirect( '/daily-view/%s-%s' % (year,month) )
+    else :
+        bot.redirect( '/view/%s-%s' % (year,month) )
 
 
 @bot.post( '/view_delete' )

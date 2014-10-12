@@ -1,10 +1,15 @@
 ### What needs to be done
 
 * sqlite3 Chinese display problem
-* daily cost view in a month
 * "/view" total balances (month/year view, whole)
 
 ### What has been done in v0.2
+
+* 2014-10-12
+  add function: daily cost view in a month
+
+* 2014-10-03  
+  put "total expenses" and "income" view on top
 
 * 2014-09-25  
   add functions: viewing default_values/currencies table
