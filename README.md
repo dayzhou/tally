@@ -4,6 +4,8 @@
 
 Tally is a _**web-based**_ program for recording everyday incomes and expenses. The underlying web engine is _[Bottle](http://bottlepy.org)_ which is a _Python_ web framework.
 
+You can see some snapshots in the __snapshots__ folder.
+
 - - -
 
 ### Installation
@@ -36,7 +38,7 @@ Tally is a _**web-based**_ program for recording everyday incomes and expenses. 
 
 * _db_manager.py_
     * A **command line tool** for manipulating the database _"tally.db"_
-    * Also as a library imported by _"tally.py"_
+    * Also as a module imported by _"tally.py"_
     * Hack it yourself
 
 * _tally.tpl_
